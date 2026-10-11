@@ -208,9 +208,9 @@ img {
 }
 
 .page {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(1400px, 90%);
   margin: 0 auto;
-  padding: 1.75rem 0 3rem;
+  padding: 1.5rem 0 3rem;
 }
 
 .stack {
@@ -1121,7 +1121,7 @@ textarea:focus {
 }
 
 .cell-title {
-  max-width: 15rem;
+  max-width: 11rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1199,7 +1199,7 @@ table {
 
 .voucher-table th,
 .voucher-table td {
-  padding: 0.95rem 1.05rem;
+  padding: 0.75rem 0.65rem;
 }
 
 th,
