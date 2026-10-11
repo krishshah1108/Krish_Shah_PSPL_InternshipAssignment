@@ -8,6 +8,9 @@ const dashboardRoutes = require('./routes/dashboard');
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 const Response = require('./utils/response');
+const db = require('./config/db');
+
+require('./cron/healthCron');
 
 const app = express();
 
@@ -53,9 +56,14 @@ app.use(
 app.use(express.json({ limit: '2mb' }));
 app.use(requestLogger);
 
-app.get('/api/health', (req, res) =>
-  Response.success('OK', { ok: true, service: 'expense-voucher-api' }, res)
-);
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.query('SELECT 1');
+    Response.success('OK', { ok: true, service: 'expense-voucher-api' }, res);
+  } catch (err) {
+    Response.error('Health check failed', res, 500);
+  }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/vouchers', voucherRoutes);
