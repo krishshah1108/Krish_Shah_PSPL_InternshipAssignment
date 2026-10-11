@@ -2,17 +2,10 @@ const cron = require('node-cron');
 const db = require('../config/db');
 const logger = require('../utils/logger');
 
-function getHealthUrl() {
-  if (process.env.HEALTH_PING_URL) {
-    return process.env.HEALTH_PING_URL;
-  }
-  const port = Number(process.env.PORT) || 5000;
-  return `http://127.0.0.1:${port}/api/health`;
-}
-
 /**
- * Single keep-alive task: ping DB and call the health API
+ * Single keep-alive task: ping DB and call this server's /api/health
  * so both database and backend HTTP stay active.
+ * Uses local PORT only (CLIENT_ORIGIN is the frontend, not the API).
  */
 async function runKeepAlive() {
   try {
@@ -22,7 +15,9 @@ async function runKeepAlive() {
     logger.error('Health cron: DB ping failed', { message: err.message });
   }
 
-  const healthUrl = getHealthUrl();
+  const port = Number(process.env.PORT) || 5000;
+  const healthUrl = `http://127.0.0.1:${port}/api/health`;
+
   try {
     const response = await fetch(healthUrl);
     if (!response.ok) {
