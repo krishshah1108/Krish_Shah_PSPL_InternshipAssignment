@@ -218,7 +218,7 @@ export default function VoucherDetailPage() {
                 onClick={handleDownload}
               >
                 <FiDownload aria-hidden="true" />
-                Download
+                Download PDF
               </button>
             )}
             <Link to="/vouchers" className="btn btn-ghost">

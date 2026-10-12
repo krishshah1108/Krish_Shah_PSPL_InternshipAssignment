@@ -1,7 +1,7 @@
 const db = require('../config/db');
 const asyncHandler = require('../utils/asyncHandler');
 const { generateVoucherNumber } = require('../utils/voucherNumber');
-const { buildVoucherHtml } = require('../utils/voucherHtml');
+const { buildVoucherPdf } = require('../utils/voucherPdf');
 const Response = require('../utils/response');
 const {
   DEPARTMENTS,
@@ -349,7 +349,8 @@ const downloadVoucher = asyncHandler(async (req, res) => {
     return Response.error('Voucher not found.', res, Response.code.notFound);
   }
 
-  return Response.download(res, buildVoucherHtml(voucher), `${voucher.voucher_number}.html`);
+  const pdf = await buildVoucherPdf(voucher);
+  return Response.download(res, pdf, `${voucher.voucher_number}.pdf`, 'application/pdf');
 });
 
 module.exports = {

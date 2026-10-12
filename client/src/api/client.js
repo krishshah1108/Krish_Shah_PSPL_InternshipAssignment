@@ -85,7 +85,7 @@ export const api = {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = match?.[1] || `voucher-${id}.html`;
+    link.download = match?.[1] || `voucher-${id}.pdf`;
     link.click();
     URL.revokeObjectURL(url);
   },

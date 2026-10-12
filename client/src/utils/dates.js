@@ -9,12 +9,6 @@ export function todayIso() {
   return toIsoDate(new Date());
 }
 
-export function shiftIsoDate(isoDate, days) {
-  const date = new Date(`${isoDate}T00:00:00`);
-  date.setDate(date.getDate() + days);
-  return toIsoDate(date);
-}
-
 /** Default expense date window: one month ago → today. */
 export function defaultExpenseDateRange() {
   const to = todayIso();
