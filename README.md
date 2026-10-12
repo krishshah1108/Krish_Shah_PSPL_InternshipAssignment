@@ -188,7 +188,7 @@ DRAFT → PENDING_APPROVAL → APPROVED
 |------|----------------|
 | Employee | Create / edit / delete **own drafts**; submit with signature |
 | Director | View all; approve (signature) or reject (reason) pending vouchers |
-| Accounts | View all; download approved/any voucher as HTML; **no** create/edit/approve/reject |
+| Accounts | View all; download vouchers as PDF; **no** create/edit/approve/reject |
 
 ---
 
@@ -238,7 +238,7 @@ Authorization: Bearer <token>
 | GET | `/vouchers/meta/options` | Auth | `{ departments, expenseCategories }` |
 | GET | `/vouchers` | Auth | List (employee: own; director/accounts: all) |
 | GET | `/vouchers/:id` | Auth | Detail with ownership checks |
-| GET | `/vouchers/:id/download` | Accounts | Download voucher as A4 HTML file |
+| GET | `/vouchers/:id/download` | Accounts | Download voucher as A4 PDF file |
 | POST | `/vouchers` | Employee | Create draft |
 | PUT | `/vouchers/:id` | Employee | Update own draft |
 | DELETE | `/vouchers/:id` | Employee | Delete own draft |
@@ -270,12 +270,12 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
 2. Assignment labels “Submitted” / “Pending Approval” are stored as a single status `PENDING_APPROVAL` and shown in the UI as **Pending**.
 3. There is **no public self-registration**; users are provisioned with `npm run seed`.
 4. Department and expense category values come from **fixed dropdown lists** (not free text).
-5. **Accounts** can view vouchers of all statuses and download HTML vouchers, but cannot create, edit, delete, approve, or reject.
+5. **Accounts** can view vouchers of all statuses and download PDF vouchers, but cannot create, edit, delete, approve, or reject.
 6. Signature images are uploaded to **Cloudinary**; only the resulting URL is stored in the database.
 7. Voucher numbers follow `VCH-YYYYMMDD-XXXX` with a daily sequence.
 8. **Voucher date** must be on or before today (not in the future); **expense date** must be on or before the voucher date (enforced in UI and API).
 9. **Search, filter, and sort** on the voucher list are available to **Director** and **Accounts** (bonus). Employees can search their own vouchers.
-10. Accounts download (`GET /vouchers/:id/download`) returns a printable A4 HTML voucher (optional bonus).
+10. Accounts download (`GET /vouchers/:id/download`) returns a printable A4 PDF voucher (optional bonus).
 11. CORS allows the Vite origin from `CLIENT_ORIGIN`; the Vite dev server proxies `/api` to the Express port.
 
 ---
@@ -301,6 +301,6 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
       controllers/        Business logic
       middleware/         Auth, validation, upload, errors
       validators/         express-validator rules
-      utils/              Response helpers, voucher HTML, etc.
+      utils/              Response helpers, voucher PDF, etc.
   README.md
 ```

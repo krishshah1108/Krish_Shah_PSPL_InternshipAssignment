@@ -25,7 +25,7 @@ const Response = {
     });
   },
 
-  download(res, content, filename, contentType = 'text/html; charset=utf-8') {
+  download(res, content, filename, contentType = 'application/pdf') {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     return res.send(content);
