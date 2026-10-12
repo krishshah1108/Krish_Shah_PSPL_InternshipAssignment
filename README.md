@@ -92,6 +92,7 @@ VITE_API_URL=/api
    VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
    ```
    Redeploy after changing `VITE_*`. SPA routes use `client/vercel.json` rewrites so `/login` refresh does not 404.
+3. Free Render instances sleep when idle. This repo includes `GET /api/health` and a GitHub Action (`.github/workflows/keep-alive.yml`) that pings it every 12 minutes to reduce cold starts. After pushing, enable **Actions** on GitHub if prompted. Optional repo variable `KEEP_ALIVE_URL` overrides the ping target.
 
 ---
 
@@ -286,26 +287,32 @@ Authorization: Bearer <token>
 }
 ```
 
-### 3.1 Auth
+### 3.1 Health
+
+| Method | Path | Access | Description |
+|--------|------|--------|-------------|
+| GET | `/health` | Public | Lightweight keep-alive / uptime check → `{ "ok": true, "service": "expense-voucher-api" }` |
+
+### 3.2 Auth
 
 | Method | Path | Access | Request body | Response `data` |
 |--------|------|--------|--------------|-----------------|
 | POST | `/auth/login` | Public | `{ "email", "password" }` | `{ "token", "user" }` |
 | GET | `/auth/me` | Auth | — | Current user profile |
 
-### 3.2 Uploads
+### 3.3 Uploads
 
 | Method | Path | Access | Request | Response `data` |
 |--------|------|--------|---------|-----------------|
 | POST | `/uploads/signature` | Employee, Director | `multipart/form-data` field `signature` | `{ "signatureUrl" }` |
 
-### 3.3 Dashboard
+### 3.4 Dashboard
 
 | Method | Path | Access | Description |
 |--------|------|--------|-------------|
 | GET | `/dashboard` | Auth | Role-specific stats and recent activity |
 
-### 3.4 Vouchers
+### 3.5 Vouchers
 
 | Method | Path | Access | Description |
 |--------|------|--------|-------------|

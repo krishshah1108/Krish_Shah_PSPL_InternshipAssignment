@@ -53,6 +53,10 @@ app.use(
 app.use(express.json({ limit: '2mb' }));
 app.use(requestLogger);
 
+app.get('/api/health', (req, res) =>
+  Response.success('OK', { ok: true, service: 'expense-voucher-api' }, res)
+);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/vouchers', voucherRoutes);
 app.use('/api/uploads', uploadRoutes);

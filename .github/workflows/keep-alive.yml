@@ -1,0 +1,21 @@
+# Pings the Render free API so it does not spin down from inactivity.
+name: Keep Render API awake
+
+on:
+  schedule:
+    # Every 12 minutes (UTC). Free Render sleeps after ~15 minutes idle.
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Ping /api/health
+        env:
+          KEEP_ALIVE_URL: ${{ vars.KEEP_ALIVE_URL }}
+        run: |
+          URL="${KEEP_ALIVE_URL:-https://krish-shah-pspl-internshipassignment.onrender.com/api/health}"
+          echo "Pinging $URL"
+          curl -sS --max-time 90 -w "\nHTTP %{http_code}\n" "$URL" || echo "Ping failed (instance may still be waking up)"
