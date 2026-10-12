@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiArrowLeft, FiFileText, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiCalendar, FiFileText, FiSave } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import LogoLoader from '../components/LogoLoader';
@@ -178,31 +178,60 @@ export default function VoucherFormPage() {
         }}
       >
         <div className="voucher-form-grid">
-          <label>
-            <span className="field-label">
-              Voucher Date<span className="required-mark">*</span>
-            </span>
-            <input
-              type="date"
-              name="voucherDate"
-              value={form.voucherDate}
-              onChange={handleChange}
-              max={maxVoucherDate}
-            />
-          </label>
+          <div className="voucher-date-pair">
+            <div className="voucher-date-pair-head">
+              <span className="voucher-date-pair-icon" aria-hidden="true">
+                <FiCalendar />
+              </span>
+              <div>
+                <p className="voucher-date-pair-title">Dates</p>
+                <p className="voucher-date-pair-hint">
+                  Expense date must be on or before the voucher date
+                </p>
+              </div>
+            </div>
+            <div className="voucher-date-fields">
+              <label className="voucher-date-field">
+                <span className="field-label">
+                  Voucher Date<span className="required-mark">*</span>
+                </span>
+                <div className="date-input">
+                  <span className="date-input-prefix" aria-hidden="true">
+                    <FiCalendar />
+                  </span>
+                  <input
+                    type="date"
+                    name="voucherDate"
+                    value={form.voucherDate}
+                    onChange={handleChange}
+                    max={maxVoucherDate}
+                  />
+                </div>
+              </label>
 
-          <label>
-            <span className="field-label">
-              Expense Date<span className="required-mark">*</span>
-            </span>
-            <input
-              type="date"
-              name="expenseDate"
-              value={form.expenseDate}
-              onChange={handleChange}
-              max={maxExpenseDate}
-            />
-          </label>
+              <div className="voucher-date-connector" aria-hidden="true">
+                <span />
+              </div>
+
+              <label className="voucher-date-field">
+                <span className="field-label">
+                  Expense Date<span className="required-mark">*</span>
+                </span>
+                <div className="date-input">
+                  <span className="date-input-prefix" aria-hidden="true">
+                    <FiCalendar />
+                  </span>
+                  <input
+                    type="date"
+                    name="expenseDate"
+                    value={form.expenseDate}
+                    onChange={handleChange}
+                    max={maxExpenseDate}
+                  />
+                </div>
+              </label>
+            </div>
+          </div>
 
           <label>
             <span className="field-label">
