@@ -20,7 +20,7 @@ Built for the **Prachay Securities Private Limited** Full Stack Developer Intern
 | README (setup, schema, API, assumptions) | This file |
 | Database schema | [`server/db/schema.sql`](server/db/schema.sql) |
 | `.env.example` | [`server/.env.example`](server/.env.example), [`client/.env.example`](client/.env.example) |
-| Screenshots / demo video | Optional (not included) |
+| Screenshots / demo video | [`project-demo/`](project-demo/) (UI screenshots + full walkthrough video) |
 
 ---
 
@@ -302,5 +302,10 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
       middleware/         Auth, validation, upload, errors
       validators/         express-validator rules
       utils/              Response helpers, voucher PDF, etc.
+  project-demo/           UI screenshots + full project walkthrough video
   README.md
 ```
+
+### Demo media (`project-demo/`)
+
+Includes numbered screenshots for Login, Employee, Director, and Accounts flows, plus `18-full-project-walkthrough.mp4` covering the end-to-end demo.
