@@ -340,7 +340,7 @@ export default function VoucherDetailPage() {
             <div className="signature-preview">
               <p>
                 {employeeFile
-                  ? 'New signature preview'
+                  ? 'Signature preview'
                   : 'Saved signature preview'}
               </p>
               <img src={signaturePreviewSrc} alt="Employee signature preview" />
