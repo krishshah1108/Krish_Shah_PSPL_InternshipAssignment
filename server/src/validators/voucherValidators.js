@@ -32,8 +32,8 @@ const createValidators = [
     .isISO8601()
     .withMessage('Voucher date is invalid.')
     .custom((value) => {
-      if (!(String(value).slice(0, 10) < todayIsoDate())) {
-        throw new Error('Voucher date must be less than today.');
+      if (!(String(value).slice(0, 10) <= todayIsoDate())) {
+        throw new Error('Voucher date cannot be in the future.');
       }
       return true;
     }),

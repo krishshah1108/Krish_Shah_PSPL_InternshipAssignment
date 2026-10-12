@@ -159,7 +159,7 @@ Stores expense vouchers and approval metadata. Signature **images** are stored i
 |--------|------|-------|
 | `id` | UUID PK | |
 | `voucher_number` | VARCHAR(40) UNIQUE | Auto-generated `VCH-YYYYMMDD-XXXX` |
-| `voucher_date` | DATE | Must be **before today** |
+| `voucher_date` | DATE | Must be **on or before today** (not in the future) |
 | `expense_date` | DATE | Must be **on or before** voucher date |
 | `department` | VARCHAR(100) | Required |
 | `expense_title` | VARCHAR(200) | Required |
@@ -273,7 +273,7 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
 5. **Accounts** can view vouchers of all statuses and download HTML vouchers, but cannot create, edit, delete, approve, or reject.
 6. Signature images are uploaded to **Cloudinary**; only the resulting URL is stored in the database.
 7. Voucher numbers follow `VCH-YYYYMMDD-XXXX` with a daily sequence.
-8. **Voucher date** must be strictly before today; **expense date** must be on or before the voucher date (enforced in UI and API).
+8. **Voucher date** must be on or before today (not in the future); **expense date** must be on or before the voucher date (enforced in UI and API).
 9. **Search, filter, and sort** on the voucher list are available to **Director** and **Accounts** (bonus). Employees can search their own vouchers.
 10. Accounts download (`GET /vouchers/:id/download`) returns a printable A4 HTML voucher (optional bonus).
 11. CORS allows the Vite origin from `CLIENT_ORIGIN`; the Vite dev server proxies `/api` to the Express port.
