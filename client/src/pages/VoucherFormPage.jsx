@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FiArrowLeft, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiFileText, FiSave } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import LogoLoader from '../components/LogoLoader';
@@ -86,7 +86,7 @@ export default function VoucherFormPage() {
       return false;
     }
     if (!form.voucherDate) {
-      toast.error('Voucher date is required.');
+      toast.error('Voucher date must be selected.');
       return false;
     }
     if (form.amount === '' || form.amount === null || form.amount === undefined) {
@@ -148,20 +148,20 @@ export default function VoucherFormPage() {
   const maxExpenseDate = form.voucherDate || maxVoucherDate;
 
   return (
-    <div className="stack narrow">
+    <div className="stack form-page">
       {saving && (
         <div className="busy-overlay">
           <LogoLoader label="Saving draft…" />
         </div>
       )}
-      <header className="page-header">
+
+      <header className="page-header surface-header">
         <div>
-          <h1>{isEdit ? 'Edit Draft Voucher' : 'Create Voucher'}</h1>
-          <p>
-            {isEdit
-              ? 'Update this draft. Submit for approval from the voucher details page.'
-              : 'Every new voucher is saved as Draft first. Submit for approval from the details page.'}
+          <p className="page-eyebrow">
+            <FiFileText aria-hidden="true" />
+            {isEdit ? 'Edit draft' : 'New voucher'}
           </p>
+          <h1>{isEdit ? 'Edit Draft Voucher' : 'Create Voucher'}</h1>
         </div>
         <Link to="/vouchers" className="btn btn-ghost">
           <FiArrowLeft aria-hidden="true" />
@@ -170,97 +170,118 @@ export default function VoucherFormPage() {
       </header>
 
       <form
-        className="panel form-grid"
+        className="voucher-form"
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
           persist();
         }}
       >
-        <label>
-          <span className="field-label">
-            Voucher Date<span className="required-mark">*</span>
-          </span>
-          <input
-            type="date"
-            name="voucherDate"
-            value={form.voucherDate}
-            onChange={handleChange}
-            max={maxVoucherDate}
-          />
-        </label>
-        <label>
-          <span className="field-label">
-            Expense Date<span className="required-mark">*</span>
-          </span>
-          <input
-            type="date"
-            name="expenseDate"
-            value={form.expenseDate}
-            onChange={handleChange}
-            max={maxExpenseDate}
-          />
-        </label>
-        <label>
-          <span className="field-label">
-            Department<span className="required-mark">*</span>
-          </span>
-          <select name="department" value={form.department} onChange={handleChange}>
-            <option value="">Select department</option>
-            {options.departments.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          <span className="field-label">
-            Expense Category<span className="required-mark">*</span>
-          </span>
-          <select name="expenseCategory" value={form.expenseCategory} onChange={handleChange}>
-            <option value="">Select category</option>
-            {options.expenseCategories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="full">
-          <span className="field-label">
-            Expense Title<span className="required-mark">*</span>
-          </span>
-          <input
-            name="expenseTitle"
-            value={form.expenseTitle}
-            onChange={handleChange}
-            maxLength={200}
-          />
-        </label>
-        <label className="full">
-          <span className="field-label">Expense Description</span>
-          <textarea
-            name="expenseDescription"
-            value={form.expenseDescription}
-            onChange={handleChange}
-            rows={4}
-          />
-        </label>
-        <label>
-          <span className="field-label">
-            Amount (INR)<span className="required-mark">*</span>
-          </span>
-          <input
-            type="number"
-            name="amount"
-            min="0.01"
-            step="0.01"
-            value={form.amount}
-            onChange={handleChange}
-          />
-        </label>
-        <div className="form-actions full">
+        <div className="voucher-form-grid">
+          <label>
+            <span className="field-label">
+              Voucher Date<span className="required-mark">*</span>
+            </span>
+            <input
+              type="date"
+              name="voucherDate"
+              value={form.voucherDate}
+              onChange={handleChange}
+              max={maxVoucherDate}
+            />
+          </label>
+
+          <label>
+            <span className="field-label">
+              Expense Date<span className="required-mark">*</span>
+            </span>
+            <input
+              type="date"
+              name="expenseDate"
+              value={form.expenseDate}
+              onChange={handleChange}
+              max={maxExpenseDate}
+            />
+          </label>
+
+          <label>
+            <span className="field-label">
+              Department<span className="required-mark">*</span>
+            </span>
+            <select name="department" value={form.department} onChange={handleChange}>
+              <option value="">Select department</option>
+              {options.departments.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="field-label">
+              Expense Category<span className="required-mark">*</span>
+            </span>
+            <select
+              name="expenseCategory"
+              value={form.expenseCategory}
+              onChange={handleChange}
+            >
+              <option value="">Select category</option>
+              {options.expenseCategories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="voucher-form-span-2">
+            <span className="field-label">
+              Expense Title<span className="required-mark">*</span>
+            </span>
+            <input
+              name="expenseTitle"
+              value={form.expenseTitle}
+              onChange={handleChange}
+              maxLength={200}
+              placeholder="e.g. Client visit travel"
+            />
+          </label>
+
+          <label className="voucher-form-span-2">
+            <span className="field-label">Expense Description</span>
+            <textarea
+              name="expenseDescription"
+              value={form.expenseDescription}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Optional notes"
+            />
+          </label>
+
+          <label className="voucher-form-amount">
+            <span className="field-label">
+              Amount (INR)<span className="required-mark">*</span>
+            </span>
+            <div className="amount-input">
+              <span className="amount-prefix" aria-hidden="true">
+                ₹
+              </span>
+              <input
+                type="number"
+                name="amount"
+                min="0.01"
+                step="0.01"
+                value={form.amount}
+                onChange={handleChange}
+                placeholder="0.00"
+              />
+            </div>
+          </label>
+        </div>
+
+        <div className="voucher-form-actions">
           <button type="submit" className="btn btn-primary" disabled={saving}>
             <FiSave aria-hidden="true" />
             {saving ? 'Saving…' : 'Save as Draft'}

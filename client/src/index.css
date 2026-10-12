@@ -196,6 +196,235 @@ img {
   color: var(--muted);
 }
 
+.surface-header {
+  align-items: center;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 2px);
+  background:
+    linear-gradient(120deg, rgba(31, 107, 74, 0.08), transparent 42%),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem;
+  color: var(--brand-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---- Form page ---- */
+.form-page {
+  gap: 1.15rem;
+}
+
+.voucher-form {
+  padding: 1.4rem 1.5rem 1.35rem;
+  background:
+    linear-gradient(145deg, rgba(31, 107, 74, 0.06), transparent 38%),
+    var(--surface);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow);
+}
+
+.voucher-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.05rem 1.15rem;
+}
+
+.voucher-form-span-2 {
+  grid-column: 1 / -1;
+}
+
+.voucher-form-amount {
+  grid-column: 1 / -1;
+  max-width: 280px;
+}
+
+.amount-input {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.amount-input:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(31, 107, 74, 0.12);
+}
+
+.amount-prefix {
+  display: grid;
+  place-items: center;
+  min-width: 2.5rem;
+  padding: 0 0.65rem;
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  font-weight: 700;
+  border-right: 1px solid var(--line);
+}
+
+.amount-input input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.amount-input input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.voucher-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.35rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- Dashboard ---- */
+.dashboard-layout {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.dashboard-split {
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.95fr);
+  align-items: start;
+}
+
+.stats-compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tip-banner {
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid #cfe3d7;
+  background: linear-gradient(120deg, var(--brand-soft), #f7fbf8);
+  box-shadow: var(--shadow);
+}
+
+.tip-banner p {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.activity-panel {
+  min-height: 100%;
+}
+
+.activity-panel .panel-head {
+  margin-bottom: 0.35rem;
+}
+
+/* ---- Detail page ---- */
+.detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
+  gap: 1.15rem;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--line);
+  border-radius: calc(var(--radius) + 2px);
+  background:
+    linear-gradient(125deg, rgba(31, 107, 74, 0.1), transparent 45%),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.detail-hero-copy h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.45rem, 2.5vw, 1.85rem);
+}
+
+.detail-hero-title {
+  margin: 0 0 0.85rem;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.detail-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: var(--bg-accent);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.detail-hero-aside {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 1rem;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #f3faf6, #eef5f1);
+  border: 1px solid #d7e5dc;
+}
+
+.detail-hero-amount {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 750;
+  color: var(--brand-dark);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.detail-card {
+  padding: 1.2rem 1.25rem;
+}
+
+.detail-card h2 {
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.02rem;
+}
+
+.detail-list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-list-grid .full {
+  grid-column: 1 / -1;
+}
+
+.action-panel-elevated {
+  border-color: #cfe3d7;
+  background:
+    linear-gradient(180deg, #fbfdfc 0%, #f5f9f6 100%);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -394,6 +623,11 @@ img {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
+.voucher-form label {
+  display: grid;
+  gap: 0.4rem;
+}
+
 label {
   display: grid;
   gap: 0.4rem;
@@ -464,18 +698,7 @@ textarea:focus {
   gap: 1.15rem;
 }
 
-.voucher-list-header {
-  align-items: center;
-  padding: 1.15rem 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: calc(var(--radius) + 2px);
-  background:
-    linear-gradient(120deg, rgba(31, 107, 74, 0.08), transparent 42%),
-    var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.voucher-list-header h1 {
+.surface-header h1 {
   margin-bottom: 0.25rem;
   font-size: clamp(1.55rem, 2.4vw, 1.9rem);
 }
@@ -1233,12 +1456,18 @@ th {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 0;
+  padding: 0.85rem 0.35rem;
   border-bottom: 1px solid var(--line);
+  border-radius: 8px;
+  transition: background 0.12s ease;
 }
 
 .activity-list li:last-child {
   border-bottom: 0;
+}
+
+.activity-list li:hover {
+  background: #f7fbf8;
 }
 
 .activity-list p {
@@ -1589,16 +1818,36 @@ th {
     align-items: stretch;
   }
 
-  .form-grid {
+  .form-grid,
+  .voucher-form-grid,
+  .dashboard-split,
+  .detail-hero,
+  .detail-layout,
+  .detail-list-grid {
     grid-template-columns: 1fr;
   }
 
-  .page-header {
-    flex-direction: column;
+  .voucher-form-amount {
+    max-width: none;
   }
 
-  .voucher-list-header {
+  .stats-compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-header,
+  .surface-header,
+  .detail-hero {
+    flex-direction: column;
     align-items: stretch;
+  }
+
+  .detail-hero-aside .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .detail-hero-aside .btn {
+    flex: 1 1 auto;
   }
 
   .filter-bar-head {
@@ -1687,6 +1936,35 @@ th {
 
   .voucher-card-meta {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    width: min(100% - 1.25rem, 1120px);
+    padding-top: 1.25rem;
+  }
+
+  .stats-compact,
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voucher-form,
+  .detail-card,
+  .detail-hero {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .nav-links {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.15rem;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
   }
 }
 

@@ -140,8 +140,9 @@ export default function VoucherListPage() {
 
   return (
     <div className="stack voucher-list-page">
-      <header className="page-header voucher-list-header">
+      <header className="page-header surface-header">
         <div>
+          <p className="page-eyebrow">Vouchers</p>
           <h1>{title}</h1>
           <p>
             {user.role === 'EMPLOYEE'

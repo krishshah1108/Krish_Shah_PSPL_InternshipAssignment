@@ -186,45 +186,53 @@ export default function VoucherDetailPage() {
   const signaturePreviewSrc = employeePreview || voucher.employeeSignatureUrl;
 
   return (
-    <div className="stack">
+    <div className="stack detail-page">
       {busy && !deleteOpen && (
         <div className="busy-overlay">
           <LogoLoader label="Working…" />
         </div>
       )}
 
-      <header className="page-header">
-        <div>
+      <header className="detail-hero">
+        <div className="detail-hero-copy">
+          <p className="page-eyebrow">Voucher detail</p>
           <h1>{voucher.voucherNumber}</h1>
-          <p>
+          <p className="detail-hero-title">{voucher.expenseTitle}</p>
+          <div className="detail-hero-meta">
             <span className={statusClass(voucher.status)}>
               {formatStatus(voucher.status)}
             </span>
-          </p>
+            <span className="meta-pill">{voucher.department}</span>
+            <span className="meta-pill">{voucher.expenseCategory}</span>
+          </div>
         </div>
-        <div className="form-actions">
-          {canAccountsExport && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={busy}
-              onClick={handleDownload}
-            >
-              <FiDownload aria-hidden="true" />
-              Download
-            </button>
-          )}
-          <Link to="/vouchers" className="btn btn-ghost">
-            <FiArrowLeft aria-hidden="true" />
-            Back
-          </Link>
+        <div className="detail-hero-aside">
+          <p className="page-eyebrow">Amount</p>
+          <p className="detail-hero-amount">{formatCurrency(voucher.amount)}</p>
+          <div className="form-actions">
+            {canAccountsExport && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={busy}
+                onClick={handleDownload}
+              >
+                <FiDownload aria-hidden="true" />
+                Download
+              </button>
+            )}
+            <Link to="/vouchers" className="btn btn-ghost">
+              <FiArrowLeft aria-hidden="true" />
+              Back
+            </Link>
+          </div>
         </div>
       </header>
 
-      <section className="panel detail-grid">
-        <div>
+      <div className="detail-layout">
+        <section className="panel detail-card">
           <h2>Basic Information</h2>
-          <dl className="detail-list">
+          <dl className="detail-list detail-list-grid">
             <div>
               <dt>Voucher Date</dt>
               <dd>{formatDate(voucher.voucherDate)}</dd>
@@ -249,16 +257,12 @@ export default function VoucherDetailPage() {
               <dt>Description</dt>
               <dd>{voucher.expenseDescription || '—'}</dd>
             </div>
-            <div>
-              <dt>Amount</dt>
-              <dd>{formatCurrency(voucher.amount)}</dd>
-            </div>
           </dl>
-        </div>
+        </section>
 
-        <div>
+        <section className="panel detail-card">
           <h2>Employee</h2>
-          <dl className="detail-list">
+          <dl className="detail-list detail-list-grid">
             <div>
               <dt>Name</dt>
               <dd>{voucher.employeeName}</dd>
@@ -276,11 +280,11 @@ export default function VoucherDetailPage() {
               <span className="meta">Not uploaded</span>
             )}
           </div>
-        </div>
+        </section>
 
-        <div>
+        <section className="panel detail-card">
           <h2>Approval</h2>
-          <dl className="detail-list">
+          <dl className="detail-list detail-list-grid">
             <div>
               <dt>Status</dt>
               <dd>{formatStatus(voucher.status)}</dd>
@@ -306,11 +310,11 @@ export default function VoucherDetailPage() {
               <span className="meta">Not available</span>
             )}
           </div>
-        </div>
+        </section>
 
-        <div>
+        <section className="panel detail-card">
           <h2>Audit</h2>
-          <dl className="detail-list">
+          <dl className="detail-list detail-list-grid">
             <div>
               <dt>Created</dt>
               <dd>{formatDate(voucher.createdAt)}</dd>
@@ -320,11 +324,11 @@ export default function VoucherDetailPage() {
               <dd>{formatDate(voucher.updatedAt)}</dd>
             </div>
           </dl>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {canEmployeeAct && (
-        <section className="panel action-panel">
+        <section className="panel action-panel action-panel-elevated">
           <h2>Draft Actions</h2>
           <label>
             <span className="field-label">
@@ -372,7 +376,7 @@ export default function VoucherDetailPage() {
       )}
 
       {canDirectorAct && (
-        <section className="panel action-panel">
+        <section className="panel action-panel action-panel-elevated">
           <h2>Director Decision</h2>
           <p className="meta">Voucher details cannot be modified. Approve or reject only.</p>
           <label>
