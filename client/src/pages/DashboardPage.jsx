@@ -45,9 +45,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="stack">
-      <header className="page-header">
+    <div className="stack dashboard-page">
+      <header className="page-header surface-header">
         <div>
+          <p className="page-eyebrow">Dashboard</p>
           <h1>Welcome, {user.name}</h1>
           <p>Overview of voucher activity for your role.</p>
         </div>
@@ -60,7 +61,7 @@ export default function DashboardPage() {
       </header>
 
       {user.role === 'EMPLOYEE' && data && (
-        <>
+        <div className="dashboard-layout">
           <div className="stat-grid">
             <StatCard label="Total Vouchers" value={data.totalVouchers} icon={FiFileText} />
             <StatCard label="Draft" value={data.draftVouchers} accent="muted" icon={FiInbox} />
@@ -88,9 +89,9 @@ export default function DashboardPage() {
             />
           </div>
           {data.draftVouchers > 0 && (
-            <section className="panel tip-panel">
+            <section className="tip-banner">
               <p>
-                You have {data.draftVouchers} draft voucher
+                You have <strong>{data.draftVouchers}</strong> draft voucher
                 {data.draftVouchers === 1 ? '' : 's'}. Open{' '}
                 <Link to="/vouchers" className="link">
                   My Vouchers
@@ -99,12 +100,12 @@ export default function DashboardPage() {
               </p>
             </section>
           )}
-        </>
+        </div>
       )}
 
       {user.role === 'DIRECTOR' && data && (
-        <>
-          <div className="stat-grid">
+        <div className="dashboard-layout dashboard-split">
+          <div className="stat-grid stats-compact">
             <StatCard
               label="Pending"
               value={data.pendingApprovalCount}
@@ -128,7 +129,7 @@ export default function DashboardPage() {
               value={formatCurrency(data.totalPendingAmount)}
             />
           </div>
-          <section className="panel">
+          <section className="panel activity-panel">
             <div className="panel-head">
               <h2>Recent Voucher Activity</h2>
               <Link to="/vouchers?status=PENDING_APPROVAL" className="link">
@@ -136,9 +137,12 @@ export default function DashboardPage() {
               </Link>
             </div>
             {!data.recentActivity?.length ? (
-              <div className="empty-state">
-                <FiInbox aria-hidden="true" />
-                <p>No recent activity.</p>
+              <div className="empty-state results-empty">
+                <span className="empty-state-icon" aria-hidden="true">
+                  <FiInbox />
+                </span>
+                <p className="empty-state-title">No recent activity</p>
+                <p>Pending vouchers will appear here.</p>
               </div>
             ) : (
               <ul className="activity-list">
@@ -160,12 +164,12 @@ export default function DashboardPage() {
               </ul>
             )}
           </section>
-        </>
+        </div>
       )}
 
       {user.role === 'ACCOUNTS' && data && (
-        <>
-          <div className="stat-grid">
+        <div className="dashboard-layout dashboard-split">
+          <div className="stat-grid stats-compact">
             <StatCard label="Total Vouchers" value={data.totalVouchers} icon={FiFileText} />
             <StatCard
               label="Pending"
@@ -190,7 +194,7 @@ export default function DashboardPage() {
               value={formatCurrency(data.totalApprovedExpenseAmount)}
             />
           </div>
-          <section className="panel">
+          <section className="panel activity-panel">
             <div className="panel-head">
               <h2>Recent Approved Vouchers</h2>
               <Link to="/vouchers" className="link">
@@ -198,9 +202,12 @@ export default function DashboardPage() {
               </Link>
             </div>
             {!data.recentApprovedVouchers?.length ? (
-              <div className="empty-state">
-                <FiInbox aria-hidden="true" />
-                <p>No approved vouchers yet.</p>
+              <div className="empty-state results-empty">
+                <span className="empty-state-icon" aria-hidden="true">
+                  <FiInbox />
+                </span>
+                <p className="empty-state-title">No approved vouchers yet</p>
+                <p>Approved claims will show up here for review.</p>
               </div>
             ) : (
               <ul className="activity-list">
@@ -220,7 +227,7 @@ export default function DashboardPage() {
               </ul>
             )}
           </section>
-        </>
+        </div>
       )}
     </div>
   );
