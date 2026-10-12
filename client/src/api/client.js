@@ -34,6 +34,19 @@ async function request(path, options = {}) {
 }
 
 export const api = {
+  /** Lightweight wake-up / availability check (supports AbortSignal for timeouts). */
+  health: async (options = {}) => {
+    const response = await fetch(`${API_BASE}/health`, {
+      method: 'GET',
+      signal: options.signal,
+    });
+    const contentType = response.headers.get('content-type') || '';
+    const payload = contentType.includes('application/json') ? await response.json() : null;
+    if (!response.ok) {
+      throw new Error(payload?.message || 'Server is unavailable.');
+    }
+    return payload?.data ?? { ok: true };
+  },
   login: (email, password) =>
     request('/auth/login', { method: 'POST', body: { email, password } }),
   me: () => request('/auth/me'),
