@@ -27,7 +27,7 @@ cp client/.env.example client/.env
 
 ```env
 PORT=5000
-CLIENT_ORIGIN=http://localhost:5173
+CLIENT_ORIGIN=http://localhost:5173,https://krishshahpsplinternshipassignment-c.vercel.app
 JWT_SECRET=change_this_to_a_long_random_string
 DATABASE_URL=postgresql://postgres.YOUR_PROJECT:YOUR_PASSWORD@aws-0-YOUR-REGION.pooler.supabase.com:5432/postgres
 CLOUDINARY_CLOUD_NAME=
@@ -38,7 +38,7 @@ CLOUDINARY_API_SECRET=
 | Variable | Required | Example | Description |
 |----------|----------|---------|-------------|
 | `PORT` | No | `5000` | TCP port for the Express API. Defaults to `5000` if omitted. |
-| `CLIENT_ORIGIN` | Yes (for browser use) | `http://localhost:5173` | Allowed CORS origin for the React app. Must match the URL you open in the browser (Vite default is `http://localhost:5173`). |
+| `CLIENT_ORIGIN` | Recommended | see Dev / Production below | Comma-separated list of allowed frontend origins for CORS (**no trailing slash**). The API also always allows local Vite and the deployed Vercel app. |
 | `JWT_SECRET` | Yes | long random string | Secret key used to **sign and verify** JWT access tokens after login. Use a long, random value in any shared or production environment. |
 | `DATABASE_URL` | Yes | `postgresql://…` | Full PostgreSQL connection string used by `pg` for all queries, `db:setup`, and `seed`. For Supabase, use the **Session pooler** URI (port `5432`) from **Connect** — the direct `db.*.supabase.co` host is IPv6-only and often fails with `ENOTFOUND` on Windows. URL-encode special characters in the password (e.g. `@` → `%40`). |
 | `CLOUDINARY_CLOUD_NAME` | Yes (for signatures) | from Cloudinary dashboard | Cloudinary cloud name. Required to upload employee/director signature images. |
@@ -48,12 +48,43 @@ CLOUDINARY_API_SECRET=
 ### Client — `client/.env.example`
 
 ```env
+# Development:
 VITE_API_URL=/api
+# Production (example):
+# VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
 ```
 
 | Variable | Required | Example | Description |
 |----------|----------|---------|-------------|
-| `VITE_API_URL` | No (recommended) | `/api` | Base URL prefix for frontend API calls. In development, keep `/api` so Vite’s proxy forwards requests to `http://localhost:5000`. For a separately hosted API, set the full backend origin (e.g. `https://api.example.com/api`). |
+| `VITE_API_URL` | Yes for production | see Dev / Production below | Base URL prefix for frontend API calls. Baked in at **build** time (`VITE_*`). |
+
+### Development vs production
+
+| Setting | Development (local) | Production (hosted) |
+|---------|---------------------|---------------------|
+| Frontend | Vite at `http://localhost:5173` | Vercel: `https://krishshahpsplinternshipassignment-c.vercel.app` |
+| Backend | Express at `http://localhost:5000` | Render: `https://krish-shah-pspl-internshipassignment.onrender.com` |
+| `VITE_API_URL` | `/api` (Vite proxies `/api` → local Express) | `https://krish-shah-pspl-internshipassignment.onrender.com/api` |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | `https://krishshahpsplinternshipassignment-c.vercel.app` (or both, comma-separated) |
+
+**Development**
+
+1. `server/.env` → at least `CLIENT_ORIGIN=http://localhost:5173` (or include both origins).
+2. `client/.env` → `VITE_API_URL=/api`.
+3. Run API (`npm start` in `server`) and UI (`npm run dev` in `client`).
+
+**Production**
+
+1. On **Render** (API), set the same secrets as local `server/.env`, and set:
+   ```env
+   CLIENT_ORIGIN=http://localhost:5173,https://krishshahpsplinternshipassignment-c.vercel.app
+   ```
+2. On **Vercel** (UI), Root Directory = `client`, and set:
+   ```env
+   VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
+   ```
+   Then **redeploy** so the new `VITE_*` value is built into the bundle.
+3. Do not add a trailing slash on origins (`…vercel.app`, not `…vercel.app/`).
 
 ---
 
@@ -312,7 +343,7 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
 8. **Voucher date** must be on or before today (not in the future); **expense date** must be on or before the voucher date (enforced in UI and API).
 9. **Search, filter, and sort** on the voucher list are available to **Director** and **Accounts** (bonus). Employees can search their own vouchers.
 10. Accounts download (`GET /vouchers/:id/download`) returns a printable A4 PDF voucher (optional bonus).
-11. CORS allows the Vite origin from `CLIENT_ORIGIN`; the Vite dev server proxies `/api` to the Express port.
+11. CORS allows local Vite (`http://localhost:5173`) and the deployed Vercel app, plus any origins listed in `CLIENT_ORIGIN` (comma-separated, no trailing slash). In development the Vite proxy forwards `/api` to Express; in production the client calls the Render API URL via `VITE_API_URL`.
 
 ---
 
