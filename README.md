@@ -12,15 +12,69 @@ Built for the **Prachay Securities Private Limited** Full Stack Developer Intern
 | Auth | JWT + bcrypt |
 | File upload | Cloudinary (employee & director signature images) |
 
-**Deliverables (as per assignment PDF §13)**
+---
 
-| Requirement | Location |
-|-------------|----------|
-| Complete source code | This repository (`client/`, `server/`) |
-| README (setup, schema, API, assumptions) | This file |
-| Database schema | [`server/db/schema.sql`](server/db/schema.sql) |
-| `.env.example` | [`server/.env.example`](server/.env.example), [`client/.env.example`](client/.env.example) |
-| Screenshots / demo video | [`project-demo/`](project-demo/) (UI screenshots + full walkthrough video) |
+## Environment variables (`.env.example`)
+
+Template files live at `server/.env.example` and `client/.env.example`. Copy them to real `.env` files locally and fill in values. **Never commit** `server/.env` or `client/.env` (they contain secrets).
+
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+```
+
+### Server — `server/.env.example`
+
+```env
+PORT=5000
+CLIENT_ORIGIN=http://localhost:5173
+JWT_SECRET=change_this_to_a_long_random_string
+DATABASE_URL=postgresql://postgres.YOUR_PROJECT:YOUR_PASSWORD@aws-0-YOUR-REGION.pooler.supabase.com:5432/postgres
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+| Variable | Required | Example | Description |
+|----------|----------|---------|-------------|
+| `PORT` | No | `5000` | TCP port for the Express API. Defaults to `5000` if omitted. |
+| `CLIENT_ORIGIN` | Yes (for browser use) | `http://localhost:5173` | Allowed CORS origin for the React app. Must match the URL you open in the browser (Vite default is `http://localhost:5173`). |
+| `JWT_SECRET` | Yes | long random string | Secret key used to **sign and verify** JWT access tokens after login. Use a long, random value in any shared or production environment. |
+| `DATABASE_URL` | Yes | `postgresql://…` | Full PostgreSQL connection string used by `pg` for all queries, `db:setup`, and `seed`. For Supabase, use the **Session pooler** URI (port `5432`) from **Connect** — the direct `db.*.supabase.co` host is IPv6-only and often fails with `ENOTFOUND` on Windows. URL-encode special characters in the password (e.g. `@` → `%40`). |
+| `CLOUDINARY_CLOUD_NAME` | Yes (for signatures) | from Cloudinary dashboard | Cloudinary cloud name. Required to upload employee/director signature images. |
+| `CLOUDINARY_API_KEY` | Yes (for signatures) | from Cloudinary dashboard | Cloudinary API key paired with the cloud name. |
+| `CLOUDINARY_API_SECRET` | Yes (for signatures) | from Cloudinary dashboard | Cloudinary API secret. Keep this private; only the server should use it. |
+
+### Client — `client/.env.example`
+
+```env
+VITE_API_URL=/api
+```
+
+| Variable | Required | Example | Description |
+|----------|----------|---------|-------------|
+| `VITE_API_URL` | No (recommended) | `/api` | Base URL prefix for frontend API calls. In development, keep `/api` so Vite’s proxy forwards requests to `http://localhost:5000`. For a separately hosted API, set the full backend origin (e.g. `https://api.example.com/api`). |
+
+---
+
+## Demo video (optional)
+
+End-to-end walkthrough (Employee → Director → Accounts).
+
+**Watch on Google Drive:** [18-full-project-walkthrough.mp4](https://drive.google.com/file/d/12KOxKEt6Kbww-Jw3lqA3FqqXXk9tzoTc/view?usp=sharing)
+
+Also available in this repo at `project-demo/18-full-project-walkthrough.mp4`:
+
+<video controls width="100%" preload="metadata">
+  <source src="project-demo/18-full-project-walkthrough.mp4" type="video/mp4" />
+  <source src="https://github.com/krishshah1108/Krish_Shah_PSPL_InternshipAssignment/raw/main/project-demo/18-full-project-walkthrough.mp4" type="video/mp4" />
+  Your browser does not support embedded video. Use the
+  <a href="https://drive.google.com/file/d/12KOxKEt6Kbww-Jw3lqA3FqqXXk9tzoTc/view?usp=sharing">Google Drive link</a>
+  or open
+  <a href="project-demo/18-full-project-walkthrough.mp4">project-demo/18-full-project-walkthrough.mp4</a>.
+</video>
+
+UI screenshots: [`project-demo/`](project-demo/) (`01-login.png` … `17-accounts-voucher-detail-download.png`).
 
 ---
 
@@ -42,25 +96,7 @@ cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-Fill in `server/.env`:
-
-| Variable | Description |
-|----------|-------------|
-| `PORT` | API port (default `5000`) |
-| `CLIENT_ORIGIN` | Frontend origin for CORS (`http://localhost:5173`) |
-| `JWT_SECRET` | Secret used to sign JWT tokens |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret |
-
-`client/.env`:
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | API base path — use `/api` with the Vite proxy |
-
-> **Supabase tip:** Prefer the **Session pooler** URI (port `5432`) from the Supabase Connect dialog. The direct `db.*.supabase.co` host is IPv6-only and often fails with `ENOTFOUND` on Windows. URL-encode special characters in the password (e.g. `@` → `%40`).
+Fill in `server/.env` and `client/.env` using the variable descriptions in [Environment variables (`.env.example`)](#environment-variables-envexample).
 
 ### 1.2 Install dependencies
 
@@ -305,7 +341,3 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
   project-demo/           UI screenshots + full project walkthrough video
   README.md
 ```
-
-### Demo media (`project-demo/`)
-
-Includes numbered screenshots for Login, Employee, Director, and Accounts flows, plus `18-full-project-walkthrough.mp4` covering the end-to-end demo.
