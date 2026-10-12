@@ -4,6 +4,12 @@ Full-stack web application that digitizes **employee expense voucher creation**,
 
 Built for the **Prachay Securities Private Limited** Full Stack Developer Internship assignment.
 
+| | URL |
+|--|-----|
+| **GitHub** | [krishshah1108/Krish_Shah_PSPL_InternshipAssignment](https://github.com/krishshah1108/Krish_Shah_PSPL_InternshipAssignment) |
+| **Live frontend** (Vercel) | [https://krishshahpsplinternshipassignment-c.vercel.app](https://krishshahpsplinternshipassignment-c.vercel.app) |
+| **Live API** (Render) | [https://krish-shah-pspl-internshipassignment.onrender.com](https://krish-shah-pspl-internshipassignment.onrender.com) |
+
 | Layer | Choice |
 |-------|--------|
 | Frontend | React (Vite), React Router, responsive UI |
@@ -37,8 +43,8 @@ CLOUDINARY_API_SECRET=
 
 | Variable | Required | Example | Description |
 |----------|----------|---------|-------------|
-| `PORT` | No | `5000` | TCP port for the Express API. Defaults to `5000` if omitted. |
-| `CLIENT_ORIGIN` | Recommended | see Dev / Production below | Comma-separated list of allowed frontend origins for CORS (**no trailing slash**). The API also always allows local Vite and the deployed Vercel app. |
+| `PORT` | No | `5000` | TCP port for the Express API. Defaults to `5000` if omitted. On Render, the platform may inject `PORT` automatically. |
+| `CLIENT_ORIGIN` | Yes (browser) | see Dev / Production below | Allowed frontend origin(s) for CORS. Use **no trailing slash**. Prefer a **single** production origin on Render (`https://krishshahpsplinternshipassignment-c.vercel.app`). Locally you may list both, comma-separated. The API also allows local Vite + the Vercel app by default. |
 | `JWT_SECRET` | Yes | long random string | Secret key used to **sign and verify** JWT access tokens after login. Use a long, random value in any shared or production environment. |
 | `DATABASE_URL` | Yes | `postgresql://…` | Full PostgreSQL connection string used by `pg` for all queries, `db:setup`, and `seed`. For Supabase, use the **Session pooler** URI (port `5432`) from **Connect** — the direct `db.*.supabase.co` host is IPv6-only and often fails with `ENOTFOUND` on Windows. URL-encode special characters in the password (e.g. `@` → `%40`). |
 | `CLOUDINARY_CLOUD_NAME` | Yes (for signatures) | from Cloudinary dashboard | Cloudinary cloud name. Required to upload employee/director signature images. |
@@ -48,44 +54,44 @@ CLOUDINARY_API_SECRET=
 ### Client — `client/.env.example`
 
 ```env
-# Development:
+# Development (Vite proxy → local API):
 VITE_API_URL=/api
-# Production (example):
+
+# Production (Vercel → Render) — set this in the Vercel project env, then redeploy:
 # VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
 ```
 
 | Variable | Required | Example | Description |
 |----------|----------|---------|-------------|
-| `VITE_API_URL` | Yes for production | see Dev / Production below | Base URL prefix for frontend API calls. Baked in at **build** time (`VITE_*`). |
+| `VITE_API_URL` | Yes for production | see Dev / Production below | Base URL prefix for frontend API calls. Baked in at **build** time (`VITE_*`). Changing it on Vercel requires a **redeploy**. |
 
 ### Development vs production
 
 | Setting | Development (local) | Production (hosted) |
 |---------|---------------------|---------------------|
-| Frontend | Vite at `http://localhost:5173` | Vercel: `https://krishshahpsplinternshipassignment-c.vercel.app` |
-| Backend | Express at `http://localhost:5000` | Render: `https://krish-shah-pspl-internshipassignment.onrender.com` |
-| `VITE_API_URL` | `/api` (Vite proxies `/api` → local Express) | `https://krish-shah-pspl-internshipassignment.onrender.com/api` |
-| `CLIENT_ORIGIN` | `http://localhost:5173` | `https://krishshahpsplinternshipassignment-c.vercel.app` (or both, comma-separated) |
+| Frontend | `http://localhost:5173` | [Vercel app](https://krishshahpsplinternshipassignment-c.vercel.app) |
+| Backend | `http://localhost:5000` | [Render API](https://krish-shah-pspl-internshipassignment.onrender.com) |
+| `VITE_API_URL` | `/api` | `https://krish-shah-pspl-internshipassignment.onrender.com/api` |
+| `CLIENT_ORIGIN` | `http://localhost:5173` | `https://krishshahpsplinternshipassignment-c.vercel.app` |
 
 **Development**
 
-1. `server/.env` → at least `CLIENT_ORIGIN=http://localhost:5173` (or include both origins).
+1. `server/.env` → `CLIENT_ORIGIN=http://localhost:5173` (or include the Vercel URL too).
 2. `client/.env` → `VITE_API_URL=/api`.
 3. Run API (`npm start` in `server`) and UI (`npm run dev` in `client`).
 
 **Production**
 
-1. On **Render** (API), set the same secrets as local `server/.env`, and set:
+1. On **Render** → Environment, set the same secrets as local `server/.env`, and:
    ```env
-   CLIENT_ORIGIN=http://localhost:5173,https://krishshahpsplinternshipassignment-c.vercel.app
+   CLIENT_ORIGIN=https://krishshahpsplinternshipassignment-c.vercel.app
    ```
-2. On **Vercel** (UI), Root Directory = `client`, and set:
+   (Single origin — no trailing slash. Avoid putting two URLs in one `Access-Control-Allow-Origin` value.)
+2. On **Vercel** → Project → Settings → Environment Variables (Root Directory = `client`):
    ```env
    VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
    ```
-   Then **redeploy** so the new `VITE_*` value is built into the bundle.
-   SPA routes (e.g. `/login`, `/vouchers/:id`) are handled by `client/vercel.json` rewrites to `index.html` so page refresh does not 404.
-3. Do not add a trailing slash on origins (`…vercel.app`, not `…vercel.app/`).
+   Redeploy after changing `VITE_*`. SPA routes use `client/vercel.json` rewrites so `/login` refresh does not 404.
 
 ---
 
