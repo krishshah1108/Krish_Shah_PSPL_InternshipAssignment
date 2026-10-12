@@ -11,9 +11,43 @@ const Response = require('./utils/response');
 
 const app = express();
 
+/** Strip trailing slash so https://app.vercel.app/ matches https://app.vercel.app */
+function normalizeOrigin(origin) {
+  return String(origin || '')
+    .trim()
+    .replace(/\/$/, '');
+}
+
+/**
+ * Allowed browser origins for CORS.
+ * - Always includes local Vite + deployed Vercel frontend
+ * - CLIENT_ORIGIN may be a single URL or comma-separated list (extra origins)
+ */
+function getAllowedOrigins() {
+  const defaults = [
+    'http://localhost:5173',
+    'https://krishshahpsplinternshipassignment-c.vercel.app',
+  ];
+  const fromEnv = (process.env.CLIENT_ORIGIN || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean);
+  return [...new Set([...defaults.map(normalizeOrigin), ...fromEnv])];
+}
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin(origin, callback) {
+      // Non-browser clients (curl, Postman, server-to-server) send no Origin
+      if (!origin) {
+        return callback(null, true);
+      }
+      const allowed = getAllowedOrigins();
+      if (allowed.includes(normalizeOrigin(origin))) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
   })
 );
 app.use(express.json({ limit: '2mb' }));
