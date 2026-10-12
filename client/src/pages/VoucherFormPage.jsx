@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import LogoLoader from '../components/LogoLoader';
 import { useToast } from '../context/ToastContext';
-import { shiftIsoDate, todayIso } from '../utils/dates';
+import { todayIso } from '../utils/dates';
 
 const INITIAL = {
   expenseDate: '',
@@ -13,7 +13,7 @@ const INITIAL = {
   expenseCategory: '',
   expenseDescription: '',
   amount: '',
-  voucherDate: shiftIsoDate(todayIso(), -1),
+  voucherDate: todayIso(),
 };
 
 export default function VoucherFormPage() {
@@ -97,8 +97,8 @@ export default function VoucherFormPage() {
       toast.error('Amount must be greater than zero.');
       return false;
     }
-    if (!(form.voucherDate < todayIso())) {
-      toast.error('Voucher date must be less than today.');
+    if (!(form.voucherDate <= todayIso())) {
+      toast.error('Voucher date cannot be in the future.');
       return false;
     }
     if (!(form.expenseDate <= form.voucherDate)) {
@@ -144,7 +144,7 @@ export default function VoucherFormPage() {
     return <LogoLoader fullPage label="Loading draft…" />;
   }
 
-  const maxVoucherDate = shiftIsoDate(todayIso(), -1);
+  const maxVoucherDate = todayIso();
   const maxExpenseDate = form.voucherDate || maxVoucherDate;
 
   return (
