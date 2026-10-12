@@ -84,6 +84,7 @@ VITE_API_URL=/api
    VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
    ```
    Then **redeploy** so the new `VITE_*` value is built into the bundle.
+   SPA routes (e.g. `/login`, `/vouchers/:id`) are handled by `client/vercel.json` rewrites to `index.html` so page refresh does not 404.
 3. Do not add a trailing slash on origins (`…vercel.app`, not `…vercel.app/`).
 
 ---
