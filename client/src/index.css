@@ -1685,11 +1685,91 @@ th {
   max-height: min(640px, calc(100vh - 2.5rem));
 }
 
-.login-form {
+.login-form-stage {
+  position: relative;
   width: min(420px, 100%);
+  margin: auto 0;
+  min-height: min(420px, 70vh);
+}
+
+.login-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
   display: grid;
   gap: 0.95rem;
-  margin: auto 0;
+}
+
+.login-form-locked {
+  filter: saturate(0.85);
+  opacity: 0.45;
+}
+
+.login-wakeup {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.85rem;
+  padding: clamp(1.1rem, 4vw, 1.75rem);
+  text-align: center;
+  border-radius: 18px;
+  background:
+    linear-gradient(160deg, rgba(247, 251, 248, 0.98), rgba(255, 255, 255, 0.96));
+  border: 1px solid #d5e0da;
+  box-shadow: 0 12px 28px rgba(28, 43, 36, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.login-wakeup-note {
+  margin: 0;
+  max-width: 28ch;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.login-wakeup-error {
+  gap: 0.75rem;
+}
+
+.login-wakeup-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+  background: #fdecec;
+  color: #b42318;
+  border: 1px solid #f0b4b0;
+  font-size: 1.35rem;
+}
+
+.login-wakeup-error h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.login-wakeup-error p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.login-wakeup-error .btn {
+  margin-top: 0.35rem;
+}
+
+.login-form {
+  width: 100%;
+  display: grid;
+  gap: 0.95rem;
 }
 
 .login-form-head {
