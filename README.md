@@ -92,7 +92,7 @@ VITE_API_URL=/api
    VITE_API_URL=https://krish-shah-pspl-internshipassignment.onrender.com/api
    ```
    Redeploy after changing `VITE_*`. SPA routes use `client/vercel.json` rewrites so `/login` refresh does not 404.
-3. Free Render instances sleep when idle. This repo includes `GET /api/health` and a GitHub Action (`.github/workflows/keep-alive.yml`) that pings it every 12 minutes to reduce cold starts. After pushing, enable **Actions** on GitHub if prompted. Optional repo variable `KEEP_ALIVE_URL` overrides the ping target.
+3. The login page calls `GET /api/health` once on load to wake a sleeping free-tier API before sign-in.
 
 ---
 
@@ -291,7 +291,7 @@ Authorization: Bearer <token>
 
 | Method | Path | Access | Description |
 |--------|------|--------|-------------|
-| GET | `/health` | Public | Lightweight keep-alive / uptime check → `{ "ok": true, "service": "expense-voucher-api" }` |
+| GET | `/health` | Public | Lightweight availability check used by the login page → `{ "ok": true, "service": "expense-voucher-api" }` |
 
 ### 3.2 Auth
 

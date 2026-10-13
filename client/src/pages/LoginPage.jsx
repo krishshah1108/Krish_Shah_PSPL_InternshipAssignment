@@ -180,7 +180,7 @@ export default function LoginPage() {
               <div className="login-wakeup" role="status" aria-live="polite">
                 <LogoLoader label="Getting things ready for you…" />
                 <p className="login-wakeup-note">
-                  Waking the server — this can take up to a minute on the free plan.
+                  Connecting to the server — this may take a moment the first time.
                 </p>
               </div>
             ) : null}
