@@ -173,28 +173,598 @@ Database definitions located at [`server/db/schema.sql`](server/db/schema.sql).
 
 ## API Reference
 
-**Base URL:** `http://localhost:5000/api`  
-**Authentication:** Include header `Authorization: Bearer <token>` on protected routes.
+**Base URL:** `http://localhost:5000/api` (Production: `https://krish-shah-pspl-internshipassignment.onrender.com/api`)  
+**Standard Response Envelope:**
+```json
+{
+  "status": 200,
+  "message": "Operation successful message.",
+  "data": { ... }
+}
+```
+
+---
 
 ### Endpoints Overview
 
 | Module | Method | Endpoint | Access | Description |
 |---|---|---|---|---|
-| **Health** | `GET` | `/health` | Public | Service health & Render wake-up probe |
+| **Health** | `GET` | `/health` | Public | Service health & Render cold-start wake-up probe |
 | **Auth** | `POST` | `/auth/login` | Public | Authenticate user & return JWT token |
-| | `GET` | `/auth/me` | Authenticated | Retrieve current user profile |
-| **Uploads**| `POST` | `/uploads/signature`| Employee / Director | Upload signature image buffer to Cloudinary |
+| | `GET` | `/auth/me` | Authenticated | Retrieve profile for authenticated token |
+| **Uploads**| `POST` | `/uploads/signature`| Employee, Director | Upload base64/file signature to Cloudinary |
 | **Dashboard**| `GET`| `/dashboard` | Authenticated | Role-customized statistics and KPIs |
-| **Vouchers**| `GET` | `/vouchers` | Authenticated | List vouchers with search, filters, and sort |
-| | `GET` | `/vouchers/meta/options` | Authenticated | Dropdown lists (departments, categories) |
-| | `GET` | `/vouchers/:id` | Authenticated | Get full voucher details by ID |
+| **Vouchers**| `GET` | `/vouchers` | Authenticated | List vouchers with multi-field search, filters, sort |
+| | `GET` | `/vouchers/meta/options` | Authenticated | Dropdown lists (departments, expense categories) |
+| | `GET` | `/vouchers/:id` | Authenticated | Get complete voucher details by ID |
 | | `POST`| `/vouchers` | Employee | Create a new voucher draft |
-| | `PUT` | `/vouchers/:id` | Employee | Update an existing draft |
-| | `DELETE`| `/vouchers/:id` | Employee | Delete an existing draft |
-| | `POST`| `/vouchers/:id/submit` | Employee | Submit draft for approval with signature |
+| | `PUT` | `/vouchers/:id` | Employee | Update an existing draft voucher |
+| | `DELETE`| `/vouchers/:id` | Employee | Delete an existing draft voucher |
+| | `POST`| `/vouchers/:id/submit` | Employee | Submit draft for approval with employee signature |
 | | `POST`| `/vouchers/:id/approve` | Director | Approve voucher with director signature |
 | | `POST`| `/vouchers/:id/reject` | Director | Reject voucher with mandatory reason |
-| | `GET` | `/vouchers/:id/download`| Accounts | Download printable A4 PDF voucher |
+| | `GET` | `/vouchers/:id/download`| Accounts | Download voucher as printable A4 PDF |
+
+---
+
+### Detailed Endpoint Specifications
+
+#### 1. System Health Check
+- **Endpoint:** `GET /health`
+- **Access:** Public (No authentication required)
+- **Description:** Uptime verification endpoint called on frontend login page load to wake up sleeping Render backend instances.
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/health"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "OK",
+  "data": {
+    "ok": true,
+    "service": "expense-voucher-api"
+  }
+}
+```
+
+---
+
+#### 2. User Login
+- **Endpoint:** `POST /auth/login`
+- **Access:** Public
+- **Description:** Authenticates user credentials via bcrypt comparison and issues an 8-hour JWT token.
+
+**Request Headers:** `Content-Type: application/json`  
+**Request Body:**
+```json
+{
+  "email": "meet.patel@abc.com",
+  "password": "Employee@123"
+}
+```
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"meet.patel@abc.com","password":"Employee@123"}'
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Signed in successfully.",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "e2a1b3c4-1234-5678-9abc-def012345678",
+      "name": "Meet Patel",
+      "email": "meet.patel@abc.com",
+      "role": "EMPLOYEE",
+      "employeeId": "EMP-101"
+    }
+  }
+}
+```
+
+---
+
+#### 3. Current User Profile
+- **Endpoint:** `GET /auth/me`
+- **Access:** Authenticated (`EMPLOYEE`, `DIRECTOR`, `ACCOUNTS`)
+- **Description:** Returns profile details of the user associated with the provided JWT bearer token.
+
+**Request Headers:** `Authorization: Bearer <TOKEN>`
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/auth/me" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "User profile fetched successfully.",
+  "data": {
+    "id": "e2a1b3c4-1234-5678-9abc-def012345678",
+    "name": "Meet Patel",
+    "email": "meet.patel@abc.com",
+    "role": "EMPLOYEE",
+    "employeeId": "EMP-101"
+  }
+}
+```
+
+---
+
+#### 4. Digital Signature Upload
+- **Endpoint:** `POST /uploads/signature`
+- **Access:** Authenticated (`EMPLOYEE`, `DIRECTOR`)
+- **Description:** Uploads signature image buffer (`image/png`, `image/jpeg`, `image/webp`) to Cloudinary and returns a secure HTTPS URL.
+
+**Request Headers:** `Authorization: Bearer <TOKEN>`, `Content-Type: multipart/form-data`  
+**Request Payload:** Form-data field `signature` containing image binary.
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/uploads/signature" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -F "signature=@/path/to/signature.png"
+```
+
+**Response (`201 Created`):**
+```json
+{
+  "status": 201,
+  "message": "Signature uploaded successfully.",
+  "data": {
+    "signatureUrl": "https://res.cloudinary.com/demo/image/upload/v1234567890/expense-vouchers/signatures/sample.png"
+  }
+}
+```
+
+---
+
+#### 5. Role-Based Dashboard Statistics
+- **Endpoint:** `GET /dashboard`
+- **Access:** Authenticated (`EMPLOYEE`, `DIRECTOR`, `ACCOUNTS`)
+- **Description:** Delivers dynamic analytical metrics tailored to the requesting user's role.
+  - **Employee:** Total claim counts, status breakdowns, total claimed amount.
+  - **Director:** Pending approvals count, today's approvals/rejections, total pending amount, recent activity feed.
+  - **Accounts:** Organization-wide totals, total approved reimbursement amount, recent approved vouchers feed.
+
+**Request Headers:** `Authorization: Bearer <TOKEN>`
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/dashboard" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK` - Employee Example):**
+```json
+{
+  "status": 200,
+  "message": "Dashboard data fetched successfully.",
+  "data": {
+    "totalVouchers": 12,
+    "draftVouchers": 3,
+    "pendingApproval": 4,
+    "approvedVouchers": 4,
+    "rejectedVouchers": 1,
+    "totalAmountClaimed": 42500.50
+  }
+}
+```
+
+---
+
+#### 6. Form Metadata Options
+- **Endpoint:** `GET /vouchers/meta/options`
+- **Access:** Authenticated (`EMPLOYEE`, `DIRECTOR`, `ACCOUNTS`)
+- **Description:** Returns the official lists of departments and expense categories for dropdown selections.
+
+**Request Headers:** `Authorization: Bearer <TOKEN>`
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/vouchers/meta/options" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Options fetched successfully.",
+  "data": {
+    "departments": [
+      "Executive",
+      "Finance & Accounts",
+      "Information Technology",
+      "Human Resources",
+      "Operations",
+      "Sales & Marketing",
+      "Legal & Compliance"
+    ],
+    "expenseCategories": [
+      "Travel & Conveyance",
+      "Client Entertainment & Meals",
+      "Office Supplies & Stationery",
+      "Hardware & IT Equipment",
+      "Software & Cloud Subscriptions",
+      "Training & Professional Development",
+      "Telecom & Internet",
+      "Miscellaneous"
+    ]
+  }
+}
+```
+
+---
+
+#### 7. List Vouchers (Search, Filter, Sort)
+- **Endpoint:** `GET /vouchers`
+- **Access:** Authenticated
+  - **Employee:** Automatically restricted to own submitted/draft vouchers.
+  - **Director / Accounts:** Global access to all organization vouchers.
+- **Query Parameters:**
+  - `search` (string): Keyword search.
+  - `searchBy` (string): Search field scope (`all`, `voucherNumber`, `expenseTitle`, `employeeName`).
+  - `department` (string): Exact department match.
+  - `expenseCategory` (string): Exact expense category match.
+  - `status` (string): Filter by status (`DRAFT`, `PENDING_APPROVAL`, `APPROVED`, `REJECTED`).
+  - `expenseDateFrom` / `expenseDateTo` (YYYY-MM-DD): Filter by expense date range.
+  - `amountMin` / `amountMax` (number): Filter by expense amount range.
+  - `sortBy` (string): Sort column (`createdAt`, `expenseDate`, `amount`, `status`, `voucherNumber`, `expenseTitle`, `employeeName`).
+  - `sortOrder` (string): `asc` or `desc` (default: `desc`).
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/vouchers?status=PENDING_APPROVAL&department=Information%20Technology&sortBy=amount&sortOrder=desc" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Vouchers fetched successfully.",
+  "data": [
+    {
+      "id": "c1f2e3d4-4567-89ab-cdef-0123456789ab",
+      "voucherNumber": "VCH-20261012-0004",
+      "voucherDate": "2026-10-12",
+      "expenseDate": "2026-10-10",
+      "department": "Information Technology",
+      "expenseTitle": "AWS Cloud Hosting Infrastructure",
+      "expenseCategory": "Software & Cloud Subscriptions",
+      "expenseDescription": "Monthly production database and API hosting fees.",
+      "amount": 18450.00,
+      "status": "PENDING_APPROVAL",
+      "employeeId": "e2a1b3c4-1234-5678-9abc-def012345678",
+      "employeeName": "Meet Patel",
+      "employeeCode": "EMP-101",
+      "employeeSignatureUrl": "https://res.cloudinary.com/.../signature.png",
+      "directorId": null,
+      "directorName": null,
+      "directorSignatureUrl": null,
+      "approvalDate": null,
+      "rejectionReason": null,
+      "createdAt": "2026-10-12T10:30:00.000Z",
+      "updatedAt": "2026-10-12T11:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### 8. Get Voucher Details
+- **Endpoint:** `GET /vouchers/:id`
+- **Access:** Authenticated (Employees can only view their own vouchers; Director/Accounts can view any).
+- **Description:** Returns complete voucher details including approval timestamps, signatures, and rejection remarks.
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/vouchers/c1f2e3d4-4567-89ab-cdef-0123456789ab" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Voucher fetched successfully.",
+  "data": {
+    "id": "c1f2e3d4-4567-89ab-cdef-0123456789ab",
+    "voucherNumber": "VCH-20261012-0004",
+    "voucherDate": "2026-10-12",
+    "expenseDate": "2026-10-10",
+    "department": "Information Technology",
+    "expenseTitle": "AWS Cloud Hosting Infrastructure",
+    "expenseCategory": "Software & Cloud Subscriptions",
+    "expenseDescription": "Monthly production database and API hosting fees.",
+    "amount": 18450.00,
+    "status": "APPROVED",
+    "employeeId": "e2a1b3c4-1234-5678-9abc-def012345678",
+    "employeeName": "Meet Patel",
+    "employeeCode": "EMP-101",
+    "employeeSignatureUrl": "https://res.cloudinary.com/.../employee_sig.png",
+    "directorId": "d3b2a1c0-9876-5432-1fed-cba987654321",
+    "directorName": "Krish Shah",
+    "directorSignatureUrl": "https://res.cloudinary.com/.../director_sig.png",
+    "approvalDate": "2026-10-12T14:20:00.000Z",
+    "rejectionReason": null,
+    "createdAt": "2026-10-12T10:30:00.000Z",
+    "updatedAt": "2026-10-12T14:20:00.000Z"
+  }
+}
+```
+
+---
+
+#### 9. Create Draft Voucher
+- **Endpoint:** `POST /vouchers`
+- **Access:** Authenticated (`EMPLOYEE` only)
+- **Description:** Generates a sequential voucher number and creates a voucher record in `DRAFT` status.
+
+**Request Body:**
+```json
+{
+  "voucherDate": "2026-10-12",
+  "expenseDate": "2026-10-11",
+  "department": "Sales & Marketing",
+  "expenseTitle": "Client Lunch Meeting",
+  "expenseCategory": "Client Entertainment & Meals",
+  "expenseDescription": "Quarterly portfolio review lunch with key investors.",
+  "amount": 3450.00
+}
+```
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/vouchers" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voucherDate": "2026-10-12",
+    "expenseDate": "2026-10-11",
+    "department": "Sales & Marketing",
+    "expenseTitle": "Client Lunch Meeting",
+    "expenseCategory": "Client Entertainment & Meals",
+    "expenseDescription": "Quarterly portfolio review lunch with key investors.",
+    "amount": 3450.00
+  }'
+```
+
+**Response (`201 Created`):**
+```json
+{
+  "status": 201,
+  "message": "Voucher saved as draft successfully.",
+  "data": {
+    "id": "a9b8c7d6-e5f4-3210-fedc-ba9876543210",
+    "voucherNumber": "VCH-20261012-0005",
+    "voucherDate": "2026-10-12",
+    "expenseDate": "2026-10-11",
+    "department": "Sales & Marketing",
+    "expenseTitle": "Client Lunch Meeting",
+    "expenseCategory": "Client Entertainment & Meals",
+    "amount": 3450.00,
+    "status": "DRAFT",
+    "employeeId": "e2a1b3c4-1234-5678-9abc-def012345678"
+  }
+}
+```
+
+---
+
+#### 10. Update Draft Voucher
+- **Endpoint:** `PUT /vouchers/:id`
+- **Access:** Authenticated (`EMPLOYEE` only)
+- **Description:** Modifies expense details of an existing voucher. The voucher must belong to the employee and must be in `DRAFT` status.
+
+**Request Body:**
+```json
+{
+  "voucherDate": "2026-10-12",
+  "expenseDate": "2026-10-11",
+  "department": "Sales & Marketing",
+  "expenseTitle": "Client Business Lunch & Parking",
+  "expenseCategory": "Client Entertainment & Meals",
+  "expenseDescription": "Included parking pass fee along with investor meal.",
+  "amount": 3750.00
+}
+```
+
+**cURL Command:**
+```bash
+curl -X PUT "http://localhost:5000/api/vouchers/a9b8c7d6-e5f4-3210-fedc-ba9876543210" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voucherDate": "2026-10-12",
+    "expenseDate": "2026-10-11",
+    "department": "Sales & Marketing",
+    "expenseTitle": "Client Business Lunch & Parking",
+    "expenseCategory": "Client Entertainment & Meals",
+    "expenseDescription": "Included parking pass fee along with investor meal.",
+    "amount": 3750.00
+  }'
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Draft voucher updated successfully.",
+  "data": {
+    "id": "a9b8c7d6-e5f4-3210-fedc-ba9876543210",
+    "voucherNumber": "VCH-20261012-0005",
+    "amount": 3750.00,
+    "status": "DRAFT"
+  }
+}
+```
+
+---
+
+#### 11. Delete Draft Voucher
+- **Endpoint:** `DELETE /vouchers/:id`
+- **Access:** Authenticated (`EMPLOYEE` only)
+- **Description:** Permanently removes a voucher. Permitted only if the voucher is in `DRAFT` status and owned by the employee.
+
+**cURL Command:**
+```bash
+curl -X DELETE "http://localhost:5000/api/vouchers/a9b8c7d6-e5f4-3210-fedc-ba9876543210" \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Voucher deleted successfully.",
+  "data": null
+}
+```
+
+---
+
+#### 12. Submit Voucher for Approval
+- **Endpoint:** `POST /vouchers/:id/submit`
+- **Access:** Authenticated (`EMPLOYEE` only)
+- **Description:** Attaches mandatory employee signature URL and transitions status from `DRAFT` $\rightarrow$ `PENDING_APPROVAL`. Once submitted, the voucher becomes read-only for the employee.
+
+**Request Body:**
+```json
+{
+  "employeeSignatureUrl": "https://res.cloudinary.com/demo/image/upload/signatures/emp_sign_123.png"
+}
+```
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/vouchers/a9b8c7d6-e5f4-3210-fedc-ba9876543210/submit" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"employeeSignatureUrl":"https://res.cloudinary.com/demo/image/upload/signatures/emp_sign_123.png"}'
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Voucher submitted for approval.",
+  "data": {
+    "id": "a9b8c7d6-e5f4-3210-fedc-ba9876543210",
+    "status": "PENDING_APPROVAL",
+    "employeeSignatureUrl": "https://res.cloudinary.com/demo/image/upload/signatures/emp_sign_123.png"
+  }
+}
+```
+
+---
+
+#### 13. Director Voucher Approval
+- **Endpoint:** `POST /vouchers/:id/approve`
+- **Access:** Authenticated (`DIRECTOR` only)
+- **Description:** Approves a pending voucher, attaching the director's digital signature URL, recording the approval timestamp, and advancing status to `APPROVED`.
+
+**Request Body:**
+```json
+{
+  "directorSignatureUrl": "https://res.cloudinary.com/demo/image/upload/signatures/dir_sign_456.png"
+}
+```
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/vouchers/a9b8c7d6-e5f4-3210-fedc-ba9876543210/approve" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"directorSignatureUrl":"https://res.cloudinary.com/demo/image/upload/signatures/dir_sign_456.png"}'
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Voucher approved successfully.",
+  "data": {
+    "id": "a9b8c7d6-e5f4-3210-fedc-ba9876543210",
+    "status": "APPROVED",
+    "directorId": "d3b2a1c0-9876-5432-1fed-cba987654321",
+    "directorSignatureUrl": "https://res.cloudinary.com/demo/image/upload/signatures/dir_sign_456.png",
+    "approvalDate": "2026-10-12T16:45:00.000Z"
+  }
+}
+```
+
+---
+
+#### 14. Director Voucher Rejection
+- **Endpoint:** `POST /vouchers/:id/reject`
+- **Access:** Authenticated (`DIRECTOR` only)
+- **Description:** Rejects a pending voucher with a mandatory reason. Transitions status to `REJECTED`, allowing the employee to view feedback.
+
+**Request Body:**
+```json
+{
+  "rejectionReason": "Itemized tax invoice is missing. Please attach original vendor receipt."
+}
+```
+
+**cURL Command:**
+```bash
+curl -X POST "http://localhost:5000/api/vouchers/a9b8c7d6-e5f4-3210-fedc-ba9876543210/reject" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"rejectionReason":"Itemized tax invoice is missing. Please attach original vendor receipt."}'
+```
+
+**Response (`200 OK`):**
+```json
+{
+  "status": 200,
+  "message": "Voucher rejected successfully.",
+  "data": {
+    "id": "a9b8c7d6-e5f4-3210-fedc-ba9876543210",
+    "status": "REJECTED",
+    "directorId": "d3b2a1c0-9876-5432-1fed-cba987654321",
+    "rejectionReason": "Itemized tax invoice is missing. Please attach original vendor receipt."
+  }
+}
+```
+
+---
+
+#### 15. Download Printable Voucher PDF
+- **Endpoint:** `GET /vouchers/:id/download`
+- **Access:** Authenticated (`ACCOUNTS` only)
+- **Description:** Dynamically streams a professionally styled A4 PDF document containing official Prachay Securities branding, complete voucher details, and embedded signatures for reimbursement settlement.
+
+**Request Headers:** `Authorization: Bearer <TOKEN>`  
+**Response Headers:**
+- `Content-Type: application/pdf`
+- `Content-Disposition: attachment; filename="VCH-20261012-0004.pdf"`
+
+**cURL Command:**
+```bash
+curl -X GET "http://localhost:5000/api/vouchers/c1f2e3d4-4567-89ab-cdef-0123456789ab/download" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -o "voucher_download.pdf"
+```
+
+**Response Binary:** Streams PDF file stream (`200 OK`).
 
 ---
 
