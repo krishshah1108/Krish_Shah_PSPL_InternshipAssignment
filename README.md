@@ -386,3 +386,10 @@ Field names in JSON are **camelCase** (e.g. `expenseCategory`, `employeeSignatur
   project-demo/           UI screenshots + full project walkthrough video
   README.md
 ```
+
+---
+
+## Acknowledgment
+
+Developed for the **Prachay Securities Private Limited (PSPL)** Full Stack Developer Internship Evaluation.
+
