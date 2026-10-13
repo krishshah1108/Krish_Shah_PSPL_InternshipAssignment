@@ -92,12 +92,12 @@ export default function LoginPage() {
         if (cancelled) return;
         if (timedOut || err?.name === 'AbortError') {
           setHealthError(
-            'The server is taking longer than expected to wake up. Please try again.'
+            'The free-tier server is still starting after being idle. This can take about a minute — please try again.'
           );
         } else {
           setHealthError(
             err?.message ||
-              'We could not reach the server. It may be starting up — please try again.'
+              'We could not reach the server. On the free plan it may still be waking from sleep — please try again.'
           );
         }
         setServerStatus('error');
@@ -180,7 +180,8 @@ export default function LoginPage() {
               <div className="login-wakeup" role="status" aria-live="polite">
                 <LogoLoader label="Getting things ready for you…" />
                 <p className="login-wakeup-note">
-                  Connecting to the server — this may take a moment the first time.
+                  Our free-tier API (Render) sleeps after inactivity. The first request can take
+                  about 50 seconds while it starts back up — thanks for waiting.
                 </p>
               </div>
             ) : null}
