@@ -34,18 +34,29 @@ async function request(path, options = {}) {
 }
 
 export const api = {
-  /** Lightweight wake-up / availability check (supports AbortSignal for timeouts). */
+  /**
+   * Wake the API host and confirm it can respond.
+   * Any HTTP response (including 401/404) means the server is up — only network
+   * failures / timeouts should block the login form.
+   */
   health: async (options = {}) => {
     const response = await fetch(`${API_BASE}/health`, {
       method: 'GET',
       signal: options.signal,
     });
-    const contentType = response.headers.get('content-type') || '';
-    const payload = contentType.includes('application/json') ? await response.json() : null;
-    if (!response.ok) {
-      throw new Error(payload?.message || 'Server is unavailable.');
+
+    // Prefer /health when deployed; older deploys may 404 — still means the host is awake.
+    if (response.ok) {
+      const contentType = response.headers.get('content-type') || '';
+      const payload = contentType.includes('application/json') ? await response.json() : null;
+      return payload?.data ?? { ok: true };
     }
-    return payload?.data ?? { ok: true };
+
+    if (response.status === 404 || response.status === 401 || response.status === 503) {
+      return { ok: true };
+    }
+
+    throw new Error('Server is unavailable right now. Please try again.');
   },
   login: (email, password) =>
     request('/auth/login', { method: 'POST', body: { email, password } }),
