@@ -189,7 +189,7 @@ Database definitions located at [`server/db/schema.sql`](server/db/schema.sql).
 
 | Module | Method | Endpoint | Access | Description |
 |---|---|---|---|---|
-| **Health** | `GET` | `/health` | Public | Service health & Render cold-start wake-up probe |
+| **Health** | `GET` | `/health` | Public | API liveness + `SELECT 1` DB probe (login wake-up & twice-daily cron) |
 | **Auth** | `POST` | `/auth/login` | Public | Authenticate user & return JWT token |
 | | `GET` | `/auth/me` | Authenticated | Retrieve profile for authenticated token |
 | **Uploads**| `POST` | `/uploads/signature`| Employee, Director | Upload base64/file signature to Cloudinary |
@@ -212,7 +212,7 @@ Database definitions located at [`server/db/schema.sql`](server/db/schema.sql).
 #### 1. System Health Check
 - **Endpoint:** `GET /health`
 - **Access:** Public (No authentication required)
-- **Description:** Uptime verification endpoint called on frontend login page load to wake up sleeping Render backend instances.
+- **Description:** Verifies the API is up and runs `SELECT 1` against Postgres so free-tier Supabase registers activity. Called on login page load (Render wake-up) and by a GitHub Actions cron twice daily (`.github/workflows/keep-alive.yml`).
 
 **cURL Command:**
 ```bash
@@ -226,8 +226,18 @@ curl -X GET "http://localhost:5000/api/health"
   "message": "OK",
   "data": {
     "ok": true,
-    "service": "expense-voucher-api"
+    "service": "expense-voucher-api",
+    "database": "up"
   }
+}
+```
+
+**Response (`503` when the database is unreachable):**
+```json
+{
+  "status": 503,
+  "message": "Database unavailable.",
+  "data": null
 }
 ```
 
@@ -775,7 +785,7 @@ curl -X GET "http://localhost:5000/api/vouchers/c1f2e3d4-4567-89ab-cdef-01234567
 3. **Data Integrity**: Vouchers cannot have a future date. The expense date must precede or match the voucher date.
 4. **Signature Storage**: Digital signatures are stored securely on Cloudinary; PostgreSQL stores only validated HTTPS asset URLs.
 5. **Printable Output**: PDF export uses vector layout with company branding, audit tables, and embedded digital signatures for accounts settlement.
-6. **Free-Tier Optimization**: Frontend automatically calls `/api/health` upon loading the login page to spin up sleeping backend dynos on Render.
+6. **Free-Tier Optimization**: Login page calls `/api/health` to wake a sleeping Render API. That same route runs `SELECT 1` so Supabase sees DB traffic. A GitHub Action (`.github/workflows/keep-alive.yml`) pings health twice daily (`0 0,12 * * *` UTC) to reduce free-plan DB auto-pause risk.
 
 ---
 

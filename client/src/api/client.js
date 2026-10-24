@@ -35,9 +35,9 @@ async function request(path, options = {}) {
 
 export const api = {
   /**
-   * Wake the API host and confirm it can respond.
-   * Any HTTP response (including 401/404) means the server is up — only network
-   * failures / timeouts should block the login form.
+   * Wake the API host and verify the database (health runs SELECT 1).
+   * 200 = API + DB up. 404 = older deploy without /health (host still awake).
+   * 503 = API up but database unavailable.
    */
   health: async (options = {}) => {
     const response = await fetch(`${API_BASE}/health`, {
@@ -45,15 +45,21 @@ export const api = {
       signal: options.signal,
     });
 
-    // Prefer /health when deployed; older deploys may 404 — still means the host is awake.
     if (response.ok) {
       const contentType = response.headers.get('content-type') || '';
       const payload = contentType.includes('application/json') ? await response.json() : null;
       return payload?.data ?? { ok: true };
     }
 
-    if (response.status === 404 || response.status === 401 || response.status === 503) {
+    // Older deploys may 404 — still means the host is awake.
+    if (response.status === 404 || response.status === 401) {
       return { ok: true };
+    }
+
+    if (response.status === 503) {
+      throw new Error(
+        'Database is unavailable right now. If using free Supabase, the project may still be resuming — try again shortly.'
+      );
     }
 
     throw new Error('Server is unavailable right now. Please try again.');
